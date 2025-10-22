@@ -1,0 +1,119 @@
+{% extends "clients/base.html" %}
+
+{% load static %}
+{% load widget_tweaks %}
+
+{% block content %}
+<style>
+@keyframes fadeIn {
+    from { opacity: 0; }
+    to { opacity: 1; }
+}
+body::before {
+    content: "";
+    position: fixed;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    background-image: url("{% static 'images/142558.jpg' %}");
+    background-size: cover;
+    background-repeat: no-repeat;
+background-position: top;
+
+    filter: blur(3px);
+    z-index: -1;
+}
+
+@font-face {
+    font-family: 'Shlapak';
+    src: url("{% static 'fonts/Shlapak.otf' %}") format('opentype');
+    font-weight: normal;
+    font-style: normal;
+}
+
+@font-face {
+    font-family: 'DolomanPavljenko';
+    src: url("{% static 'fonts/DolomanPavljenko.ttf' %}") format('truetype');
+    font-weight: normal;
+    font-style: normal;
+}
+
+.title-box {
+    font-family: 'DolomanPavljenko', sans-serif;
+    /* border: 2px solid white; убрали рамку */
+    padding: 5px 10px;
+    font-size: 5rem;
+    font-weight: bold;
+    color: white;
+    border-radius: 1px;
+    background-color: transparent; /* фон полностью прозрачный */
+    margin-bottom: 5px;
+    transform: translateY(-10px);
+    text-align: center;
+}
+
+.form_reg {
+    font-family: 'DolomanPavljenko', sans-serif;
+    font-size: 1.2rem;
+    width: 1000px; /* сжали по ширине */
+    height: 700px;
+    background-color: rgba(0, 0, 0, 0.3);
+    color: white;
+    padding: 20px 30px 20px 30px; /* уменьшили вертикальные отступы снизу */
+    box-sizing: border-box;
+    border-radius: 10px;
+
+    position: fixed;
+    top: 50%;
+    left: 50%;
+    transform: translate(-50%, -50%);
+
+    display: flex;
+    flex-direction: column;
+    justify-content: space-between;
+    text-align: center;
+}
+
+.gray-text {
+    color: #9C9DA1;
+}
+</style>
+
+<div class="form_reg py-2 gray-text">
+  <h1 class="title-box">Статистика</h1>
+      Всего рассылок
+        <p><span id="total-mailings">{{ total_mailings }}</span></p>
+      Успешных
+        <p><span id="successful-mailings">{{ successful_mailings }}</span></p>
+      Неуспешных
+        <p><span id="failed-mailings">{{ failed_mailings }}</span></p>
+      Всего сообщений
+        <p><span id="total-messages">{{ total_messages }}</span></p>
+</div>
+<script>
+async function updateStats() {
+    try {
+        const res = await fetch("{% url 'authentication:stats_data_api' %}");
+        if (!res.ok) throw new Error("Ошибка запроса");
+
+        const data = await res.json();
+
+        // Обновляем значения на странице
+        document.getElementById('total-mailings').textContent = data.total_mailings;
+        document.getElementById('active-mailings').textContent = data.successful_mailings; // или 'active_mailings' если используешь другое поле
+        document.getElementById('recipients-count').textContent = data.sent_messages; // уникальные клиенты
+
+    } catch (err) {
+        console.error("Не удалось обновить статистику:", err);
+    }
+}
+
+// Обновление каждые 5 секунд
+setInterval(updateStats, 5000);
+// Немедленно при загрузке страницы
+updateStats();
+</script>
+
+
+{% endblock %}

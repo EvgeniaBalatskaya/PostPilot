@@ -1,0 +1,1040 @@
+{% extends "clients/base.html" %}
+
+{% load static %}
+{% load widget_tweaks %}
+
+{% block content %}
+
+<style>
+@keyframes fadeIn {
+    from { opacity: 0; }
+    to { opacity: 1; }
+}
+body::before {
+    content: "";
+    position: fixed;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    background-image: url("{% static 'images/142558.jpg' %}");
+    background-size: cover;
+    background-repeat: no-repeat;
+    background-position: top;
+    filter: blur(3px);
+    z-index: -1;
+}
+
+@font-face {
+    font-family: 'Shlapak';
+    src: url("{% static 'fonts/Shlapak.otf' %}") format('opentype');
+    font-weight: normal;
+    font-style: normal;
+}
+
+@font-face {
+    font-family: 'DolomanPavljenko';
+    src: url("{% static 'fonts/DolomanPavljenko.ttf' %}") format('truetype');
+    font-weight: normal;
+    font-style: normal;
+}
+
+.title-box {
+    font-family: 'DolomanPavljenko', sans-serif;
+    padding: 5px 10px;
+    font-size: 5rem;
+    font-weight: bold;
+    color: white;
+    background-color: transparent;
+    margin-bottom: 5px;
+    transform: translateY(-10px);
+    text-align: center;
+}
+
+.form_reg {
+    font-family: 'DolomanPavljenko', sans-serif;
+    font-size: 1.2rem;
+    width: 1000px;
+    height: 850px; /* фикс. высоту лучше убрать */
+    max-width: 95%;
+    max-height: 90vh;
+    background-color: rgba(0, 0, 0, 0.3);
+    color: white;
+    padding: 20px 30px;
+    box-sizing: border-box;
+    border-radius: 10px;
+    position: fixed;
+    top: 50%;
+    left: 50%;
+    transform: translate(-50%, -50%);
+    display: flex;
+    flex-direction: column;
+    align-items: stretch; /* растягивает таблицу на всю ширину */
+    justify-content: flex-start; /* прижимает всё вверх */
+    overflow-y: auto; /* скролл всей страницы при переполнении */
+    text-align: center;
+
+}
+
+/* Медиа-запрос для очень маленьких экранов */
+@media (max-width: 1100px) {
+    .form_reg {
+        width: 95%; /* на очень маленьких экранах занимает почти всю ширину */
+        padding: 15px 20px; /* уменьшаем паддинги */
+    }
+}
+
+/* Для мобильных устройств */
+@media (max-width: 768px) {
+    .form_reg {
+        font-size: 1rem; /* уменьшаем шрифт */
+        padding: 10px 15px;
+    }
+}
+
+.gray-text {
+    color: #9C9DA1;
+}
+
+.link-gray {
+  color: #9C9DA1;
+  text-decoration: none;
+  transition: color 0.3s;
+  font-size: 2rem;
+  background: none;
+  border: none;
+  cursor: pointer;
+  font-family: 'DolomanPavljenko', 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+}
+
+.link-gray:hover {
+  color: white;
+}
+
+.add-client-btn {
+    font-family: 'DolomanPavljenko', sans-serif;
+    font-size: 1.5rem;
+    padding: 10px 25px;
+    color: #9C9DA1;
+    background: transparent;
+    border: 1px solid transparent;
+    border-radius: 8px;
+    cursor: pointer;
+    transition: color 0.3s ease;
+    margin-bottom: 20px;
+}
+
+.add-client-btn:hover {
+    color: white;
+}
+
+.table-container {
+    width: 100%;
+    overflow-x: hidden;
+    overflow-y: auto;
+    max-height: 450px;
+    border: none;
+}
+
+.table-clients {
+    width: 100%;
+    border-collapse: collapse;
+    font-family: 'DolomanPavljenko', sans-serif;
+    border-top: none;
+}
+
+.table-clients th {
+    border-bottom: 2px solid rgba(255, 255, 255, 0.2);
+    border-top: none; /* ← убираем верхнюю границу заголовков */
+}
+
+/* Стилизация скроллбара */
+.table-container::-webkit-scrollbar {
+    width: 6px;
+}
+
+.table-container::-webkit-scrollbar-track {
+    background: rgba(255, 255, 255, 0.05);
+    border-radius: 3px;
+}
+
+.table-container::-webkit-scrollbar-thumb {
+    background: rgba(255, 255, 255, 0.4);
+    border-radius: 3px;
+}
+
+.table-container::-webkit-scrollbar-thumb:hover {
+    background: rgba(255, 255, 255, 0.4);
+}
+
+.table-container {
+    scrollbar-width: thin;
+    scrollbar-color: rgba(255, 255, 255, 0.3) rgba(255, 255, 255, 0.05);
+}
+
+.table-clients {
+    width: 100%;
+    border-collapse: collapse;
+    font-family: 'DolomanPavljenko', sans-serif;
+}
+
+.table-clients th, .table-clients td {
+    padding: 14px 18px;
+    text-align: left;
+    white-space: normal;
+    word-wrap: break-word;
+}
+
+.table-clients thead {
+  font-weight: normal !important;
+    position: sticky;
+    top: 0;
+
+    backdrop-filter: blur(8px); /* добавляет размытие фона под заголовком */
+    z-index: 10;
+}
+
+.table-clients tbody tr {
+    background-color: transparent;
+    transition: background-color 0.2s ease, transform 0.1s ease;
+}
+
+.table-clients tbody tr:hover {
+    background-color: rgba(255, 255, 255, 0.08);
+    transform: scale(1.01);
+}
+
+.table-clients th {
+  font-weight: normal !important;
+    border-bottom: 2px solid rgba(255, 255, 255, 0.2);
+}
+
+.table-clients td {
+  font-weight: normal !important;
+    border-bottom: 1px solid rgba(255, 255, 255, 0.1);
+}
+
+.switch-btn {
+    font-family: 'DolomanPavljenko', sans-serif;
+    background-color: rgba(0,0,0,0.3);
+    color: white;
+    border: 1px solid rgba(255,255,255,0.3);
+    padding: 8px 16px;
+    cursor: pointer;
+    border-radius: 5px;
+    margin: 0 5px;
+    font-size: 1.2rem;
+}
+.switch-btn.active {
+    background-color: rgba(255,255,255,0.1);
+    font-weight: bold;
+}
+.table-switcher-container {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin-bottom: 10px;
+}
+
+.switcher-left,
+.switcher-right {
+  display: flex;
+  align-items: center;
+  gap: 2px; /* расстояние между кнопками в паре (уменьшено) */
+}
+
+/* Можно чуть уменьшить ширину плюсовых кнопок, чтобы выглядело аккуратнее */
+.add-mail-btn {
+  padding: 6px 10px;
+  font-size: 1rem;
+}
+
+/* Кнопки действий */
+.action-buttons {
+    display: flex;
+    gap: 10px;
+    justify-content: center;
+}
+
+.btn-mailing {
+    font-family: 'DolomanPavljenko', sans-serif;
+    background: transparent;
+    border: 1px solid rgba(255, 255, 255, 0.3);
+    color: #9C9DA1;
+    padding: 5px 15px;
+    border-radius: 5px;
+    cursor: pointer;
+    transition: all 0.3s;
+    font-size: 1.1rem;
+}
+
+.btn-mailing:hover {
+    color: white;
+    border-color: white;
+    background: rgba(255, 255, 255, 0.1);
+}
+
+.btn-mailing:disabled {
+    opacity: 0.5;
+    cursor: not-allowed;
+}
+
+.gray-text {
+    color: #9C9DA1;
+}
+
+/* Модальные окна */
+.modal {
+  display: none;
+  position: fixed;
+  z-index: 1000;
+  left: 0; top: 0;
+  width: 100%; height: 100%;
+  backdrop-filter: blur(7px); /* добавляет размытие фона под заголовком */
+}
+
+.modal-content {
+    font-family: 'DolomanPavljenko', sans-serif;
+    background-color: rgba(0, 0, 0, 0.4);
+    color: white;
+    margin: 0 auto;
+    padding: 20px;
+    border-radius: 10px;
+    width: 500px;       /* фиксированная ширина */
+    max-width: 90%;     /* не растягиваться больше 90% экрана */
+    min-width: 300px;   /* минимальная ширина, чтобы не сжималось слишком */
+    box-shadow: 0 0 20px rgba(128,128,128,0.5);
+    position: fixed;
+    top: 50%;
+    left: 50%;
+    transform: translate(-50%, -50%);
+    box-sizing: border-box;
+    z-index: 1010;
+}
+
+
+.close {
+  float: right;
+  font-size: 24px;
+  cursor: pointer;
+  color: gray;
+  transition: color 0.3s;
+}
+.close:hover {
+  color: white;
+}
+
+.modal-content input,
+.modal-content textarea {
+  width: 400px;       /* фиксированная ширина */
+  margin: 10px 0 40px;
+  padding: 10px 5px;
+  color: white;
+  border: none;
+  border-bottom: 1px solid rgba(255, 255, 255, 0.3);
+  border-radius: 0;
+  box-sizing: border-box;
+  background-color: transparent !important;
+  transition: border-bottom 0.3s ease, box-shadow 0.3s ease;
+  resize: none;       /* для textarea отключаем изменение размера */
+}
+
+
+
+/* Подсветка при наведении */
+.modal-content input:hover,
+.modal-content textarea:hover {
+  border-bottom: 2px solid rgba(255, 255, 255, 0.6);
+}
+
+/* Подсветка при фокусе */
+.modal-content input:focus,
+.modal-content textarea:focus {
+  outline: none;
+  border-bottom: 2px solid #ffffff;
+  box-shadow: 0 1px 0 0 #ffffff; /* дополнительная подсветка */
+}
+
+/* Стили для автозаполнения */
+.modal-content input:-webkit-autofill,
+.modal-content input:-webkit-autofill:hover,
+.modal-content input:-webkit-autofill:focus,
+.modal-content input:-webkit-autofill:active {
+  -webkit-box-shadow: 0 0 0 1000px transparent inset !important;
+  -webkit-text-fill-color: white !important;
+  caret-color: white;
+  transition: background-color 5000s ease-in-out 0s, border-bottom 0.3s ease;
+}
+
+.modal-content input:autofill,
+.modal-content input:autofill:hover,
+.modal-content input:autofill:focus,
+.modal-content input:autofill:active {
+  box-shadow: 0 0 0 1000px transparent inset !important;
+  -webkit-text-fill-color: white !important;
+  caret-color: white;
+  transition: background-color 5000s ease-in-out 0s, border-bottom 0.3s ease;
+}
+
+.modal-content button {
+    font-family: 'DolomanPavljenko', sans-serif;
+  background: transparent;
+  color: gray;
+  border: none;
+  padding: 15px 20px;
+  font-size: 25px;
+  border-radius: 6px;
+  cursor: pointer;
+  transition: color 0.3s;
+}
+.modal-content button:hover {
+  color: white;
+}
+
+.buttons-container {
+    display: flex;
+    justify-content: center;
+    margin-bottom: 20px;
+    gap: 20px;
+}
+.add-mail-btn {
+    font-family: 'DolomanPavljenko', sans-serif;
+    font-size: 1.6rem;
+    padding: 20px 25px;
+    color: #9C9DA1;
+    background: transparent;
+    border: 1px solid transparent;
+    border-radius: 8px;
+    cursor: pointer;
+    transition: color 0.3s ease;
+    margin-bottom: 20px;
+}
+.modal-content label {
+  display: block;       /* label на отдельной строке */
+  margin-bottom: 5px;   /* отступ от надписи до инпута */
+  font-weight: bold;
+}
+.add-mail-btn:hover {
+    color: white;
+}
+/* Увеличенный размер для + */
+.add-btn {
+    font-family: 'DolomanPavljenko', sans-serif;
+  font-size: 3rem; /* размер символа + */
+  font-weight: normal;
+  line-height: 1;
+  padding: 2px 10px;
+    color: #9C9DA1;
+  margin-left: 1px; /* чуть меньше отступ между словами и плюсом */
+}
+
+.add-btn:hover {
+    color: white;
+}
+.add-mail-btn.active-tab {
+    color: #fff; /* белый цвет для активной вкладки */
+    border-radius: 4px;
+}
+/* Медиа-запросы */
+@media (max-width: 1100px) {
+    .form_reg {
+        width: 95%;
+        padding: 15px 20px;
+    }
+    .modal-content {
+        width: 80%;
+    }
+}
+
+@media (max-width: 768px) {
+    .form_reg {
+        font-size: 1rem;
+        padding: 10px 15px;
+    }
+
+    .action-buttons {
+        flex-direction: column;
+        gap: 5px;
+    }
+
+    .btn-mailing {
+        font-size: 1rem;
+        padding: 3px 10px;
+    }
+
+    .modal-content {
+        width: 95%;
+        margin: 5% auto;
+        padding: 20px;
+    }
+    .disabled-btn {
+    opacity: 0.5;
+    cursor: not-allowed;
+
+}
+
+</style>
+
+<div class="form_reg py-2 gray-text">
+    <h1 class="title-box">Управление рассылками</h1>
+
+        <!-- Модалка для создания сообщения -->
+        <div id="messageModal" class="modal">
+            <div class="modal-content">
+            <span class="close" onclick="closeModal('messageModal')">&times;</span>
+            <h3>Создать сообщение</h3>
+                <form method="post" action="{% url 'authentication:create_message' %}">
+                    {% csrf_token %}
+                    <div>
+                        <label for="id_subject">Тема:</label>
+                        <input type="text" name="subject" id="id_subject" required>
+                    </div>
+                    <div>
+                        <label for="id_body">Текст сообщения:</label>
+                        <textarea name="body" id="id_body" rows="4" required></textarea>
+                    </div>
+                    <button type="submit">Сохранить</button>
+                </form>
+            </div>
+        </div>
+
+        <!-- Модалка для создания рассылки -->
+        <div id="mailingModal" class="modal">
+            <div class="modal-content">
+                <span class="close" onclick="closeModal('mailingModal')">&times;</span>
+                <h3>Создать рассылку</h3>
+                <form method="post" action="{% url 'authentication:create_mailing' %}">
+                {% csrf_token %}
+                    <div>
+                        <label for="id_start_time">Дата и время начала:</label>
+                        <input type="datetime-local" name="start_time" id="id_start_time" required>
+                    </div>
+                    <div>
+                        <label for="id_end_time">Дата и время окончания:</label>
+                        <input type="datetime-local" name="end_time" id="id_end_time" required>
+                    </div>
+                    <div>
+                        <label for="id_message">Сообщение:</label>
+                        <select name="message" id="id_message" required>
+                            <option value="">Выберите сообщение</option>
+                            {% for msg in all_messages %}
+                            <option value="{{ msg.id }}">{{ msg.subject }}</option>
+                            {% endfor %}
+                        </select>
+                    </div>
+                    <div>
+                        <label for="id_recipients">Получатели:</label>
+                            <select name="recipients" id="id_recipients" multiple required>
+                                {% for recipient in request.user.recipient_list.all %}
+                                <option value="{{ recipient.id }}">{{ recipient.email }} - {{ recipient.full_name }}</option>
+                                {% endfor %}
+                            </select>
+                            <small>Для выбора нескольких получателей удерживайте Ctrl</small>
+                    </div>
+                    <button type="submit">Создать рассылку</button>
+                </form>
+            </div>
+        </div>
+
+        <!-- Модалка для редактирования сообщения -->
+        <div id="editMessageModal" class="modal">
+            <div class="modal-content">
+                <span class="close" onclick="closeModal('editMessageModal')">&times;</span>
+                <h3>Редактировать сообщение</h3>
+                <form method="post" id="editMessageForm">
+                    {% csrf_token %}
+                    <input type="hidden" name="message_id" id="edit_message_id">
+                    <div>
+                        <label for="edit_subject">Тема:</label>
+                        <input type="text" name="subject" id="edit_subject" required>
+                    </div>
+                    <div>
+                        <label for="edit_body">Текст сообщения:</label>
+                        <textarea name="body" id="edit_body" rows="4" required></textarea>
+                    </div>
+                    <button type="submit">Сохранить</button>
+                </form>
+            </div>
+        </div>
+
+        <!-- Модалка редактирования рассылки -->
+        <div id="editMailingModal" class="modal">
+            <div class="modal-content">
+                <span class="close" onclick="closeModal('editMailingModal')">&times;</span>
+                <h3>Редактировать рассылку</h3>
+                <form method="post" id="editMailingForm">
+                    {% csrf_token %}
+                    <div>
+                        <label for="edit_start_time">Дата и время начала:</label>
+                        <input type="datetime-local" name="start_time" id="edit_start_time" required>
+                    </div>
+                    <div>
+                        <label for="edit_end_time">Дата и время окончания:</label>
+                        <input type="datetime-local" name="end_time" id="edit_end_time" required>
+                    </div>
+                    <div>
+                        <label for="edit_message">Сообщение:</label>
+                        <select name="message" id="edit_message" required>
+                          <option value="">Выберите сообщение</option>
+                          {% for msg in all_messages %}
+                            <option value="{{ msg.id }}">{{ msg.subject }}</option>
+                          {% endfor %}
+                        </select>
+                    </div>
+                    <div>
+                        <label for="edit_recipients">Получатели:</label>
+                        <select name="recipients" id="edit_recipients" multiple required>
+                          {% for recipient in request.user.recipient_list.all %}
+                            <option value="{{ recipient.id }}">{{ recipient.email }} - {{ recipient.full_name }}</option>
+                          {% endfor %}
+                        </select>
+                        <small>Для выбора нескольких получателей удерживайте Ctrl</small>
+                    </div>
+                    <button type="submit">Сохранить изменения</button>
+                </form>
+            </div>
+        </div>
+
+        <!-- Кнопки перехода и добавления -->
+        <div class="table-switcher-container mb-5">
+            <div class="switcher-left">
+                <button onclick="showModal('mailingModal')" class="add-mail-btn add-btn">+</button>
+                <button id="showMailingsBtn" class="add-mail-btn">Рассылки</button>
+            </div>
+            <div class="switcher-right">
+                <button id="showMessagesBtn" class="add-mail-btn active-tab">Сообщения</button>
+                <button onclick="showModal('messageModal')" class="add-mail-btn add-btn">+</button>
+            </div>
+        </div>
+
+        <!-- Список сообщений -->
+        <div id="messagesTable">
+            <div class="table-container">
+                <table class="table-clients">
+                    <thead>
+                        <tr>
+                            <th style="width: 30%;">Тема</th>
+                            <th style="width: 60%;">Текст</th>
+                            <th style="width: 10%;"></th>
+                        </tr>
+                    </thead>
+                    <tbody id="messages-container">
+                     {% for msg in all_messages %}
+                    <tr onclick="openEditMessageModal({{ msg.id }}, '{{ msg.subject|escapejs }}', '{{ msg.body|escapejs }}')" style="cursor: pointer;">
+                        <td>{{ msg.subject }}</td>
+                        <td>{{ msg.body|truncatechars:50 }}</td>
+                        <td>
+                            <!-- Кнопка удаления сообщения -->
+                            <form method="post" action="{% url 'authentication:delete_message' msg.id %}" class="delete-message-form">
+                                {% csrf_token %}
+                                <button type="submit" class="link-gray"
+                                        onclick="event.stopPropagation(); return confirm('Удалить сообщение?');"
+                                        title="Удалить">
+                                    <svg width="30px" height="30px" viewBox="0 0 1024 1024" fill="#000000">
+                                        <path d="M779.5 1002.7h-535c-64.3 0-116.5-52.3-116.5-116.5V170.7h768v715.5c0 64.2-52.3 116.5-116.5 116.5zM213.3 256v630.1c0 17.2 14 31.2 31.2 31.2h534.9c17.2 0 31.2-14 31.2-31.2V256H213.3z" fill="#ffffff"/>
+                                        <path d="M917.3 256H106.7C83.1 256 64 236.9 64 213.3s19.1-42.7 42.7-42.7h810.7c23.6 0 42.7 19.1 42.7 42.7S940.9 256 917.3 256zM618.7 128H405.3c-23.6 0-42.7-19.1-42.7-42.7s19.1-42.7 42.7-42.7h213.3c23.6 0 42.7 19.1 42.7 42.7S642.2 128 618.7 128zM405.3 725.3c-23.6 0-42.7-19.1-42.7-42.7v-256c0-23.6 19.1-42.7 42.7-42.7S448 403 448 426.6v256c0 23.6-19.1 42.7-42.7 42.7zM618.7 725.3c-23.6 0-42.7-19.1-42.7-42.7v-256c0-23.6 19.1-42.7 42.7-42.7s42.7 19.1 42.7 42.7v256c-0.1 23.6-19.2 42.7-42.7 42.7z" fill="currentColor"/>
+                                    </svg>
+                                </button>
+                            </form>
+                        </td>
+                    </tr>
+                    {% empty %}
+                    <tr><td colspan="3" class="text-center">Нет сообщений</td></tr>
+                    {% endfor %}
+                    </tbody>
+
+                </table>
+            </div>
+        </div>
+
+        <!-- Список рассылок -->
+        <div id="mailingsTable" style="display: none;">
+            <div class="table-container">
+                <table class="table-clients">
+                    <thead>
+                        <tr>
+                            <th>Статус</th>
+                            <th>Начало</th>
+                            <th>Окончание</th>
+                            <th>Сообщение</th>
+                            <th></th>
+                        </tr>
+                    </thead>
+                    <tbody id="mailings-container">
+                     {% for mailing in mailings %}
+                    <tr style="cursor: pointer;"
+                        data-id="{{ mailing.id }}"
+                        onclick="openEditMailingModal(
+                            {{ mailing.id }},
+                            '{{ mailing.start_time|date:'Y-m-d\\TH:i' }}',
+                            '{{ mailing.end_time|date:'Y-m-d\\TH:i' }}',
+                            {{ mailing.message.id }},
+                            [{% for r in mailing.recipients.all %}{{ r.id }},{% endfor %}]
+                        )">
+
+                    <td>{{ mailing.status }}</td>
+                    <td>{{ mailing.start_time|date:"d.m.Y H:i" }}</td>
+                    <td>{{ mailing.end_time|date:"d.m.Y H:i" }}</td>
+                    <td>{{ mailing.message.subject|truncatechars:30 }}</td>
+                    <td>
+                        <div class="action-buttons">
+                            <!-- Кнопка запуска рассылки -->
+                                    <form method="post" class="start-mailing-form" data-id="{{ mailing.id }}" onclick="event.stopPropagation();">
+                                    {% csrf_token %}
+
+                                    {% if mailing.status == 'Запущена' %}
+                                    <!-- Кнопка Стоп -->
+                                    <button type="submit" class="link-gray stop-btn" title="Остановить рассылку">
+                                          <svg viewBox="0 0 1024 1024" class="icon" xmlns="http://www.w3.org/2000/svg" fill="#000000" width="30" height="30">
+                                               <path d="M512 1024C229.7 1024 0 794.3 0 512S229.7 0 512 0s512 229.7 512 512-229.7 512-512 512z m0-938.7C276.7 85.3 85.3 276.7 85.3 512S276.7 938.7 512 938.7 938.7 747.3 938.7 512 747.3 85.3 512 85.3z" fill="#ffffff"></path>
+                                              <path d="M632.7 675.3c-10.9 0-21.8-4.2-30.2-12.5L361.1 421.5c-16.7-16.7-16.7-43.7 0-60.3 16.7-16.7 43.7-16.7 60.3 0l241.4 241.4c16.7 16.7 16.7 43.7 0 60.3-8.3 8.3-19.2 12.4-30.1 12.4z" fill="currentColor"></path>
+                                              <path d="M391.3 675.3c-10.9 0-21.8-4.2-30.2-12.5-16.7-16.7-16.7-43.7 0-60.3l241.4-241.4c16.7-16.7 43.7-16.7 60.3 0 16.7 16.7 16.7 43.7 0 60.3L421.5 662.8c-8.4 8.4-19.3 12.5-30.2 12.5z" fill="currentColor"></path>
+                                          </svg>
+
+
+                                        </svg>
+                                    </button>
+                                    {% else %}
+                                    <!-- Кнопка Старт (как было) -->
+                                    <button type="submit" class="link-gray" {% if mailing.status == 'Завершена' %}disabled{% endif %}>
+                                        <svg viewBox="0 0 1024 1024" class="icon" xmlns="http://www.w3.org/2000/svg" fill="#000000" width="30" height="30">
+                                            <path d="M512 1024C229.7 1024 0 794.3 0 512S229.7 0 512 0s512 229.7 512 512-229.7 512-512 512z m0-938.7C276.7 85.3 85.3 276.7 85.3 512S276.7 938.7 512 938.7 938.7 747.3 938.7 512 747.3 85.3 512 85.3z" fill="#ffffff"></path>
+                                            <path d="M434.8 688.2c-7.4 0-14.7-1.9-21.3-5.7-13.2-7.6-21.3-21.7-21.3-37V384c0-15.2 8.1-29.3 21.3-37 13.2-7.6 29.5-7.6 42.7 0l226.5 130.8c13.2 7.6 21.3 21.7 21.3 37 0 15.2-8.1 29.3-21.3 37L456.1 682.5c-6.6 3.9-13.9 5.7-21.3 5.7z m42.7-230.3v113.8l98.5-56.9-98.5-56.9z" fill="currentColor"></path>
+                                        </svg>
+                                    </button>
+                                    {% endif %}
+
+                                </form>
+
+                                <!-- Кнопка удаления -->
+                                <form method="post" class="delete-mailing-form" data-id="{{ mailing.id }}"
+                                      onclick="event.stopPropagation();" style="display:inline;">
+                                    {% csrf_token %}
+                                    <button type="submit" class="link-gray" title="Удалить рассылку">
+                                    <svg width="30px" height="30px" viewBox="0 0 1024 1024" fill="#000000">
+                                        <path d="M779.5 1002.7h-535c-64.3 0-116.5-52.3-116.5-116.5V170.7h768v715.5c0 64.2-52.3 116.5-116.5 116.5zM213.3 256v630.1c0 17.2 14 31.2 31.2 31.2h534.9c17.2 0 31.2-14 31.2-31.2V256H213.3z" fill="#ffffff"/>
+                                        <path d="M917.3 256H106.7C83.1 256 64 236.9 64 213.3s19.1-42.7 42.7-42.7h810.7c23.6 0 42.7 19.1 42.7 42.7S940.9 256 917.3 256zM618.7 128H405.3c-23.6 0-42.7-19.1-42.7-42.7s19.1-42.7 42.7-42.7h213.3c23.6 0 42.7 19.1 42.7 42.7S642.2 128 618.7 128zM405.3 725.3c-23.6 0-42.7-19.1-42.7-42.7v-256c0-23.6 19.1-42.7 42.7-42.7S448 403 448 426.6v256c0 23.6-19.1 42.7-42.7 42.7zM618.7 725.3c-23.6 0-42.7-19.1-42.7-42.7v-256c0-23.6 19.1-42.7 42.7-42.7s42.7 19.1 42.7 42.7v256c-0.1 23.6-19.2 42.7-42.7 42.7z" fill="currentColor"/>
+                                    </svg>
+                                    </button>
+                                </form>
+                            </div>
+                        </td>
+                    </tr>
+                    {% empty %}
+                    <tr><td colspan="6" class="text-center">Нет рассылок</td></tr>
+                    {% endfor %}
+                    </tbody>
+                </table>
+            </div>
+        </div>
+
+
+
+<script>
+// ================================
+// 1. Универсальные функции модалок
+// ================================
+function openModal(modalId) {
+    document.getElementById(modalId).style.display = 'block';
+    document.body.style.overflow = 'hidden';
+}
+
+function closeModal(modalId) {
+    document.getElementById(modalId).style.display = 'none';
+    document.body.style.overflow = '';
+}
+
+// Закрытие модалки по клику вне неё
+window.onclick = function(event) {
+    if (event.target.classList.contains('modal')) {
+        event.target.style.display = 'none';
+        document.body.style.overflow = '';
+    }
+};
+
+// Закрытие по ESC
+document.addEventListener('keydown', function(event) {
+    if (event.key === 'Escape') {
+        document.querySelectorAll('.modal').forEach(m => m.style.display = 'none');
+        document.body.style.overflow = '';
+    }
+});
+
+// ================================
+// 2. Вкладки (Сообщения / Рассылки)
+// ================================
+const messagesTable = document.getElementById('messagesTable');
+const mailingsTable = document.getElementById('mailingsTable');
+const showMessagesBtn = document.getElementById('showMessagesBtn');
+const showMailingsBtn = document.getElementById('showMailingsBtn');
+
+function activateMessages() {
+    messagesTable.style.display = 'block';
+    mailingsTable.style.display = 'none';
+    showMessagesBtn.classList.add('active-tab');
+    showMailingsBtn.classList.remove('active-tab');
+}
+
+function activateMailings() {
+    messagesTable.style.display = 'none';
+    mailingsTable.style.display = 'block';
+    showMailingsBtn.classList.add('active-tab');
+    showMessagesBtn.classList.remove('active-tab');
+}
+
+showMessagesBtn.addEventListener('click', activateMessages);
+showMailingsBtn.addEventListener('click', activateMailings);
+
+// ================================
+// 3. Открытие модалок создания
+// ================================
+
+// кнопка "Добавить сообщение"
+const addMessageBtn = document.getElementById('addMessageBtn');
+if (addMessageBtn) {
+    addMessageBtn.addEventListener('click', () => openModal('messageModal'));
+}
+
+// кнопка "Создать рассылку"
+const addMailingBtn = document.getElementById('addMailingBtn');
+if (addMailingBtn) {
+    addMailingBtn.addEventListener('click', () => openModal('mailingModal'));
+}
+
+// ================================
+// 4. Редактирование сообщения
+// ================================
+function openEditMessageModal(id, subject, body) {
+    document.getElementById('edit_message_id').value = id;
+    document.getElementById('edit_subject').value = subject;
+    document.getElementById('edit_body').value = body;
+    document.getElementById('editMessageForm').action = `/authentication/mailings/edit-message/${id}/`;
+    openModal('editMessageModal');
+}
+
+// ================================
+// 5. Редактирование рассылки
+// ================================
+function openEditMailingModal(id, start_time, end_time, message_id, recipient_ids) {
+    const modal = document.getElementById('editMailingModal');
+    const form = document.getElementById('editMailingForm');
+
+    form.action = `/authentication/edit_mailing/${id}/`;
+    document.getElementById('edit_start_time').value = start_time;
+    document.getElementById('edit_end_time').value = end_time;
+    document.getElementById('edit_message').value = message_id;
+
+    const recipientsSelect = document.getElementById('edit_recipients');
+    for (let option of recipientsSelect.options) {
+        option.selected = recipient_ids.includes(parseInt(option.value));
+    }
+
+    openModal('editMailingModal');
+}
+
+// ================================
+// 6. Обновление таблицы рассылок без перезагрузки
+// ================================
+async function refreshMailings() {
+    const response = await fetch(window.location.href, {
+        headers: { 'X-Requested-With': 'XMLHttpRequest' }
+    });
+
+    if (!response.ok) return;
+
+    const html = await response.text();
+    const parser = new DOMParser();
+    const doc = parser.parseFromString(html, 'text/html');
+
+    const newBody = doc.querySelector('#mailings-container');
+    const oldBody = document.querySelector('#mailings-container');
+
+    if (newBody && oldBody) {
+        oldBody.innerHTML = newBody.innerHTML;
+        initDeleteMailingForms(); // заново активируем кнопки удаления
+        initStartMailingForms();  // и запуска
+    }
+}
+
+// ================================
+// 7. Запуск рассылки (AJAX)
+// ================================
+function initStartMailingForms() {
+    document.querySelectorAll('.start-mailing-form').forEach(form => {
+        form.addEventListener('submit', function(e) {
+            e.preventDefault();
+            e.stopPropagation();
+
+            const mailingId = this.dataset.id;
+            const csrfToken = this.querySelector('[name=csrfmiddlewaretoken]').value;
+
+            fetch("{% url 'authentication:start_mailing' 0 %}".replace('0', mailingId), {
+                method: "POST",
+                headers: { "X-CSRFToken": csrfToken }
+            })
+            .then(response => {
+                if(response.ok) {
+                    alert("Рассылка запущена!");
+                    refreshMailings();
+                } else {
+                    alert("Ошибка при запуске рассылки.");
+                }
+            });
+        });
+    });
+}
+
+// ================================
+// 8. Удаление рассылки (AJAX)
+// ================================
+function initDeleteMailingForms() {
+    document.querySelectorAll('.delete-mailing-form').forEach(form => {
+        form.addEventListener('submit', function(e) {
+            e.preventDefault();
+            e.stopPropagation();
+
+            if(!confirm('Удалить рассылку?')) return;
+
+            const formData = new FormData(this);
+            const mailingId = this.dataset.id;
+
+            fetch("{% url 'authentication:delete_mailing' 0 %}".replace('0', mailingId), {
+                method: 'POST',
+                body: formData,
+                headers: { 'X-Requested-With': 'XMLHttpRequest' }
+            })
+            .then(response => {
+                if (response.ok) {
+                    this.closest('tr').remove();
+                } else {
+                    alert('Ошибка при удалении рассылки');
+                }
+            });
+        });
+    });
+}
+initDeleteMailingForms();
+initStartMailingForms();
+
+// ================================
+// 9. Создание рассылки (AJAX)
+// ================================
+const createMailingForm = document.querySelector('#mailingModal form');
+if (createMailingForm) {
+    createMailingForm.addEventListener('submit', function(e) {
+        e.preventDefault();
+
+        const modal = document.getElementById('mailingModal');
+        const formData = new FormData(this);
+        const csrfToken = formData.get('csrfmiddlewaretoken');
+
+        fetch("{% url 'authentication:create_mailing' %}", {
+            method: 'POST',
+            headers: {
+                'X-CSRFToken': csrfToken,
+                'X-Requested-With': 'XMLHttpRequest'
+            },
+            body: formData
+        })
+        .then(response => {
+            if (response.ok) {
+                modal.style.display = 'none';
+                this.reset();
+                refreshMailings();
+            } else {
+                alert('Ошибка при создании рассылки');
+            }
+        })
+        .catch(() => alert('Ошибка при создании рассылки'));
+    });
+}
+
+// ================================
+// 10. Редактирование рассылки (AJAX)
+// ================================
+const editMailingForm = document.querySelector('#editMailingForm');
+if (editMailingForm) {
+    editMailingForm.addEventListener('submit', function(e) {
+        e.preventDefault();
+
+        const modal = document.getElementById('editMailingModal');
+        const formData = new FormData(this);
+        const csrfToken = formData.get('csrfmiddlewaretoken');
+
+        fetch(this.action, {
+            method: 'POST',
+            headers: {
+                'X-CSRFToken': csrfToken,
+                'X-Requested-With': 'XMLHttpRequest'
+            },
+            body: formData
+        })
+        .then(response => {
+            if (response.ok) {
+                modal.style.display = 'none';
+                refreshMailings();
+            } else {
+                alert('Ошибка при сохранении изменений');
+            }
+        })
+        .catch(() => alert('Ошибка при сохранении изменений'));
+    });
+}
+
+// ================================
+// 11. По умолчанию показываем рассылки
+// ================================
+document.addEventListener('DOMContentLoaded', activateMailings);
+    // Простая совместимость: если showModal не определён — определим его.
+// Также делаем защиту от ошибок: если уже есть глобальный showModal/openModal, не перезаписываем.
+if (typeof showModal !== 'function') {
+  function showModal(id) {
+    try {
+      const el = document.getElementById(id);
+      if (!el) return console.warn('Modal not found:', id);
+      el.style.display = 'block';
+      document.body.style.overflow = 'hidden';
+    } catch (err) {
+      console.error('showModal error', err);
+    }
+  }
+}
+
+// И алиас для openModal если где-то в коде используются оба имени
+if (typeof openModal !== 'function') {
+  function openModal(id) { return showModal(id); }
+}
+
+  function refreshMailingsStatus() {
+      fetch("{% url 'authentication:mailings_status_api' %}") // API
+          .then(res => res.json())
+          .then(data => {
+              data.mailings.forEach(mailing => {
+                  const row = document.querySelector(`tr[data-id='${mailing.id}']`);
+                  if (!row) return;
+
+                  // Обновляем текст статуса
+                  row.querySelector('td:first-child').textContent = mailing.status;
+
+                  // Обновляем кнопку Старт/Стоп
+                  const btn = row.querySelector('.start-mailing-form button');
+                  if (mailing.status === 'Завершена') {
+                      btn.disabled = true;
+                  } else if (mailing.status === 'Запущена') {
+                      btn.classList.add('stop-btn');
+                  } else {
+                      btn.classList.remove('stop-btn');
+                      btn.disabled = false;
+                  }
+              });
+          });
+  }
+
+  setInterval(refreshMailingsStatus, 15000); // каждые 15 секунд
+</script>
+
+
+
+
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/js/bootstrap.bundle.min.js"></script>
+{% endblock %}

@@ -1,0 +1,483 @@
+{% extends "clients/base.html" %}
+
+{% load static %}
+{% load widget_tweaks %}
+{% block content %}
+<style>
+@keyframes fadeIn {
+    from { opacity: 0; }
+    to { opacity: 1; }
+}
+body::before {
+    content: "";
+    position: fixed;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    background-image: url("{% static 'images/142558.jpg' %}");
+    background-size: cover;
+    background-repeat: no-repeat;
+    background-position: top;
+    filter: blur(3px);
+    z-index: -1;
+}
+
+@font-face {
+    font-family: 'Shlapak';
+    src: url("{% static 'fonts/Shlapak.otf' %}") format('opentype');
+    font-weight: normal;
+    font-style: normal;
+}
+
+@font-face {
+    font-family: 'DolomanPavljenko';
+    src: url("{% static 'fonts/DolomanPavljenko.ttf' %}") format('truetype');
+    font-weight: normal;
+    font-style: normal;
+}
+
+.title-box {
+    font-family: 'DolomanPavljenko', sans-serif;
+    padding: 5px 10px;
+    font-size: 5rem;
+    font-weight: bold;
+    color: white;
+    background-color: transparent;
+    margin-bottom: 5px;
+    transform: translateY(-10px);
+    text-align: center;
+}
+
+.form_reg {
+    font-family: 'DolomanPavljenko', sans-serif;
+    font-size: 1.2rem;
+    width: 1000px;
+    height: 850px; /* фикс. высоту лучше убрать */
+    max-width: 95%;
+    max-height: 90vh;
+    background-color: rgba(0, 0, 0, 0.3);
+    color: white;
+    padding: 20px 30px;
+    box-sizing: border-box;
+    border-radius: 10px;
+    position: fixed;
+    top: 50%;
+    left: 50%;
+    transform: translate(-50%, -50%);
+    display: flex;
+    flex-direction: column;
+    align-items: stretch; /* растягивает таблицу на всю ширину */
+    justify-content: flex-start; /* прижимает всё вверх */
+    overflow-y: auto; /* скролл всей страницы при переполнении */
+    text-align: center;
+
+}
+
+/* Медиа-запрос для очень маленьких экранов */
+@media (max-width: 1100px) {
+    .form_reg {
+        width: 95%; /* на очень маленьких экранах занимает почти всю ширину */
+        padding: 15px 20px; /* уменьшаем паддинги */
+    }
+}
+
+/* Для мобильных устройств */
+@media (max-width: 768px) {
+    .form_reg {
+        font-size: 1rem; /* уменьшаем шрифт */
+        padding: 10px 15px;
+    }
+}
+
+.gray-text {
+    color: #9C9DA1;
+}
+
+.link-gray {
+  color: #9C9DA1;
+  text-decoration: none;
+  transition: color 0.3s;
+  font-size: 2rem;
+  background: none;
+  border: none;
+  cursor: pointer;
+  font-family: 'DolomanPavljenko', 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+}
+
+.link-gray:hover {
+  color: white;
+}
+
+.add-client-btn {
+    font-family: 'DolomanPavljenko', sans-serif;
+    font-size: 1.5rem;
+    padding: 10px 25px;
+    color: #9C9DA1;
+    background: transparent;
+    border: 1px solid transparent;
+    border-radius: 8px;
+    cursor: pointer;
+    transition: color 0.3s ease;
+    margin-bottom: 20px;
+}
+
+.add-client-btn:hover {
+    color: white;
+}
+
+.table-container {
+    width: 100%;
+    overflow-x: hidden;
+    overflow-y: auto;
+    max-height: 600px;
+    border: none;
+}
+
+.table-clients {
+    width: 100%;
+    border-collapse: collapse;
+    font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+    border-top: none;
+}
+
+.table-clients th {
+    border-bottom: 2px solid rgba(255, 255, 255, 0.2);
+    border-top: none; /* ← убираем верхнюю границу заголовков */
+}
+
+/* Стилизация скроллбара */
+.table-container::-webkit-scrollbar {
+    width: 6px;
+}
+
+.table-container::-webkit-scrollbar-track {
+    background: rgba(255, 255, 255, 0.05);
+    border-radius: 3px;
+}
+
+.table-container::-webkit-scrollbar-thumb {
+    background: rgba(255, 255, 255, 0.4);
+    border-radius: 3px;
+}
+
+.table-container::-webkit-scrollbar-thumb:hover {
+    background: rgba(255, 255, 255, 0.4);
+}
+
+.table-container {
+    scrollbar-width: thin;
+    scrollbar-color: rgba(255, 255, 255, 0.3) rgba(255, 255, 255, 0.05);
+}
+
+.table-clients {
+    width: 100%;
+    border-collapse: collapse;
+    font-family: 'DolomanPavljenko', sans-serif;
+}
+
+.table-clients th, .table-clients td {
+    padding: 14px 18px;
+    text-align: left;
+    white-space: normal;
+    word-wrap: break-word;
+}
+
+.table-clients thead {
+    font-weight: bold;
+    position: sticky;
+    top: 0;
+
+    backdrop-filter: blur(8px); /* добавляет размытие фона под заголовком */
+    z-index: 10;
+}
+
+.table-clients tbody tr {
+    background-color: transparent;
+    transition: background-color 0.2s ease, transform 0.1s ease;
+}
+
+.table-clients tbody tr:hover {
+    background-color: rgba(255, 255, 255, 0.08);
+    transform: scale(1.01);
+}
+
+.table-clients th {
+    border-bottom: 2px solid rgba(255, 255, 255, 0.2);
+}
+
+.table-clients td {
+    border-bottom: 1px solid rgba(255, 255, 255, 0.1);
+}
+
+.modal {
+  display: none;
+  position: fixed;
+  z-index: 1000;
+  left: 0; top: 0;
+  width: 100%; height: 100%;
+    backdrop-filter: blur(5px); /* добавляет размытие фона под заголовком */
+}
+
+.modal-content {
+    font-family: 'DolomanPavljenko', sans-serif;
+  background-color: rgba(0, 0, 0, 0.4);
+  color: white;
+  margin: 10% auto;
+  padding: 20px;
+  border-radius: 10px;
+  width: 400px;
+  box-shadow: 0 0 20px rgba(128,128,128,0.5);
+  position: fixed;
+  top: 50%;
+  left: 50%;
+  transform: translate(-50%, -50%);
+  box-sizing: border-box;
+  z-index: 1010;
+}
+
+.close {
+  float: right;
+  font-size: 24px;
+  cursor: pointer;
+  color: gray;
+  transition: color 0.3s;
+}
+.close:hover {
+  color: white;
+}
+
+.modal-content input,
+.modal-content textarea {
+  width: 100%;
+  margin: 5px 0 15px;
+  padding: 10px 0; /* убираем боковые паддинги */
+  color: white;
+  border: none; /* убираем стандартную рамку */
+  border-bottom: 1px solid rgba(255, 255, 255, 0.3); /* нижняя полоса */
+  border-radius: 0; /* убираем скругления */
+  box-sizing: border-box;
+  background-color: transparent !important;
+  transition: border-bottom 0.3s ease, box-shadow 0.3s ease;
+}
+
+/* Подсветка при наведении */
+.modal-content input:hover,
+.modal-content textarea:hover {
+  border-bottom: 1px solid rgba(255, 255, 255, 0.6);
+}
+
+/* Подсветка при фокусе */
+.modal-content input:focus,
+.modal-content textarea:focus {
+  outline: none;
+  border-bottom: 1px solid #ffffff;
+  box-shadow: 0 1px 0 0 #ffffff; /* дополнительная подсветка */
+}
+
+/* Стили для автозаполнения */
+.modal-content input:-webkit-autofill,
+.modal-content input:-webkit-autofill:hover,
+.modal-content input:-webkit-autofill:focus,
+.modal-content input:-webkit-autofill:active {
+  -webkit-box-shadow: 0 0 0 1000px transparent inset !important;
+  -webkit-text-fill-color: white !important;
+  caret-color: white;
+  transition: background-color 5000s ease-in-out 0s, border-bottom 0.3s ease;
+}
+
+.modal-content input:autofill,
+.modal-content input:autofill:hover,
+.modal-content input:autofill:focus,
+.modal-content input:autofill:active {
+  box-shadow: 0 0 0 1000px transparent inset !important;
+  -webkit-text-fill-color: white !important;
+  caret-color: white;
+  transition: background-color 5000s ease-in-out 0s, border-bottom 0.3s ease;
+}
+
+.modal-content button {
+    font-family: 'DolomanPavljenko', sans-serif;
+  background: transparent;
+  color: gray;
+  border: none;
+  padding: 15px 30px;
+  font-size: 25px;
+  border-radius: 6px;
+  cursor: pointer;
+  transition: color 0.3s;
+}
+.modal-content button:hover {
+  color: white;
+}
+
+.buttons-container {
+    display: flex;
+    justify-content: center;
+    margin-bottom: 20px;
+    gap: 20px;
+}
+</style>
+<div class="form_reg py-2 gray-text">
+  <h1 class="title-box">Управление клиентами</h1>
+
+  <!-- Кнопка "Добавить клиента" -->
+  <div class="buttons-container">
+    <button class="add-client-btn" onclick="openModal()" title="Добавить клиента">
+      Добавить клиента
+    </button>
+  </div>
+
+
+
+  <!-- Модальное окно для добавления -->
+  <div id="addClientModal" class="modal">
+    <div class="modal-content">
+      <span onclick="closeModal()" class="close">&times;</span>
+      <h2>Добавить клиента</h2>
+      <form method="post">
+        {% csrf_token %}
+        <input type="hidden" name="action" value="add">
+
+        <label>Email:</label>
+        <input type="email" name="email" required>
+
+        <label>Ф. И. О.:</label>
+        <input type="text" name="full_name" required>
+
+        <label>Комментарий:</label>
+        <textarea name="comment"></textarea>
+
+        <button type="submit">Сохранить</button>
+      </form>
+    </div>
+  </div>
+
+  <!-- Модальное окно для редактирования -->
+  <div id="editClientModal" class="modal">
+    <div class="modal-content">
+      <span onclick="closeEditModal()" class="close">&times;</span>
+      <h2>Редактировать клиента</h2>
+      <form method="post" id="editForm">
+        {% csrf_token %}
+        <input type="hidden" name="action" value="edit">
+        <input type="hidden" name="recipient_id" id="edit_recipient_id">
+
+        <label>Email</label>
+        <input type="email" name="email" id="edit_email" required>
+
+        <label>Ф. И. О.</label>
+        <input type="text" name="full_name" id="edit_full_name" required>
+
+        <label>Комментарий</label>
+        <textarea name="comment" id="edit_comment"></textarea>
+
+        <button type="submit">Сохранить изменения</button>
+      </form>
+    </div>
+  </div>
+
+<div class="table-container">
+    <table class="table-clients">
+      <thead>
+        <tr>
+          <th>Email</th>
+          <th>Ф. И. О.</th>
+          <th>Комментарий</th>
+          <th></th>
+        </tr>
+      </thead>
+      <tbody>
+        {% for recipient in recipients %}
+        <tr onclick="openEditModal({{ recipient.id }}, '{{ recipient.email|escapejs }}', '{{ recipient.full_name|escapejs }}', '{{ recipient.comment|escapejs }}')" style="cursor: pointer;">
+          <td>{{ recipient.email }}</td>
+          <td>{{ recipient.full_name }}</td>
+          <td class="comment-cell" title="{{ recipient.comment }}">
+            {{ recipient.comment|truncatechars:50 }}
+          </td>
+          <td>
+
+            <!-- Удалить -->
+            <form method="post" style="display:inline-block;" onclick="event.stopPropagation();">
+              {% csrf_token %}
+              <input type="hidden" name="action" value="delete">
+              <input type="hidden" name="recipient_id" value="{{ recipient.id }}">
+              <button type="submit" class="link-gray" onclick="return confirm('Удалить получателя?');" title="Удалить">
+                <svg width="30px" height="30px" viewBox="0 0 1024 1024" fill="#000000"> <path d="M779.5 1002.7h-535c-64.3 0-116.5-52.3-116.5-116.5V170.7h768v715.5c0 64.2-52.3 116.5-116.5 116.5zM213.3 256v630.1c0 17.2 14 31.2 31.2 31.2h534.9c17.2 0 31.2-14 31.2-31.2V256H213.3z" fill="#ffffff"/> <path d="M917.3 256H106.7C83.1 256 64 236.9 64 213.3s19.1-42.7 42.7-42.7h810.7c23.6 0 42.7 19.1 42.7 42.7S940.9 256 917.3 256zM618.7 128H405.3c-23.6 0-42.7-19.1-42.7-42.7s19.1-42.7 42.7-42.7h213.3c23.6 0 42.7 19.1 42.7 42.7S642.2 128 618.7 128zM405.3 725.3c-23.6 0-42.7-19.1-42.7-42.7v-256c0-23.6 19.1-42.7 42.7-42.7S448 403 448 426.6v256c0 23.6-19.1 42.7-42.7 42.7zM618.7 725.3c-23.6 0-42.7-19.1-42.7-42.7v-256c0-23.6 19.1-42.7 42.7-42.7s42.7 19.1 42.7 42.7v256c-0.1 23.6-19.2 42.7-42.7 42.7z" fill="currentColor"/> </svg>
+              </button>
+            </form>
+          </td>
+        </tr>
+        {% empty %}
+        <tr><td colspan="4">Нет получателей</td></tr>
+        {% endfor %}
+      </tbody>
+    </table>
+  </div>
+</div>
+
+<script>
+function openModal() {
+  document.getElementById('addClientModal').style.display = 'block';
+  document.body.style.overflow = 'hidden'; // блокируем прокрутку
+}
+
+function closeModal() {
+  document.getElementById('addClientModal').style.display = 'none';
+  document.body.style.overflow = ''; // возвращаем прокрутку
+}
+
+function openEditModal(id, email, fullName, comment) {
+  document.getElementById('edit_recipient_id').value = id;
+  document.getElementById('edit_email').value = email;
+  document.getElementById('edit_full_name').value = fullName;
+  document.getElementById('edit_comment').value = comment;
+  document.getElementById('editClientModal').style.display = 'block';
+  document.body.style.overflow = 'hidden'; // блокируем прокрутку
+}
+
+function closeEditModal() {
+  document.getElementById('editClientModal').style.display = 'none';
+  document.body.style.overflow = ''; // возвращаем прокрутку
+}
+
+// Закрытие при клике вне окна
+window.onclick = function(event) {
+  const addModal = document.getElementById('addClientModal');
+  const editModal = document.getElementById('editClientModal');
+
+  if (event.target === addModal) {
+    closeModal();
+  }
+  if (event.target === editModal) {
+    closeEditModal();
+  }
+}
+
+// Закрытие по ESC
+document.addEventListener('keydown', function(event) {
+  if (event.key === "Escape") {
+    closeModal();
+    closeEditModal();
+  }
+});
+
+async function updateMembers() {
+    const res = await fetch("{% url 'authentication:members_data_api' %}");
+    const data = await res.json();
+
+    const container = document.getElementById('recipients-container');
+    container.innerHTML = '';
+    data.recipients.forEach(r => {
+        const div = document.createElement('div');
+        div.innerHTML = `${r.name} - ${r.email}`;
+        container.appendChild(div);
+    });
+}
+
+setInterval(updateMembers, 5000);
+updateMembers();
+</script>
+
+
+{% endblock %}

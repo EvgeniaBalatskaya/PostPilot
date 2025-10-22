@@ -1,0 +1,165 @@
+{% extends "clients/base.html" %}
+{% block title %}Мой профиль{% endblock %}
+
+{% block content %}
+{% load static %}
+{% load widget_tweaks %}
+
+<style>
+@keyframes fadeIn {
+    from { opacity: 0; }
+    to { opacity: 1; }
+}
+
+body::before {
+    content: "";
+    position: fixed;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    background-image: url("{% static 'images/142558.jpg' %}");
+    background-size: cover;
+    background-repeat: no-repeat;
+    background-position: top;
+    filter: blur(3px);
+    z-index: -1;
+}
+
+.title-box {
+    font-family: 'DolomanPavljenko', sans-serif;
+    padding: 5px 10px;
+    font-size: 5rem;
+    font-weight: bold;
+    color: white;
+    background-color: transparent;
+    margin-bottom: 20px;
+    text-align: center;
+}
+
+.form_reg {
+    font-family: 'DolomanPavljenko', sans-serif;
+    font-size: 1.2rem;
+    width: 800px;
+    background-color: rgba(0, 0, 0, 0.3);
+    color: white;
+    padding: 30px;
+    box-sizing: border-box;
+    border-radius: 10px;
+
+    position: fixed;
+    top: 50%;
+    left: 50%;
+    transform: translate(-50%, -50%);
+
+    display: flex;
+    flex-direction: column;
+    gap: 20px;
+    text-align: center;
+}
+
+.profile-card {
+    display: flex;
+    align-items: center;
+    gap: 30px;
+    justify-content: center;
+    flex-wrap: wrap; /* чтобы на мобильных экранах переносилось */
+}
+
+.profile-img-wrapper {
+    position: relative;
+    width: 150px;
+    height: 150px;
+    border-radius: 5%;
+    overflow: hidden;
+
+    box-shadow: 0 0 30px rgba(128, 128, 128, 0.5);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+}
+
+.profile-img {
+    width: 100%;
+    height: 100%;
+    border-radius: 2%;
+    object-fit: cover;
+    display: block;
+    box-shadow: 0 0 20px rgba(0,0,0,0);
+}
+
+.profile-info {
+    display: flex;
+    flex-direction: column;
+    gap: 10px;
+    color: white;
+    text-align: left;
+}
+
+.profile-info h2 {
+    font-size: 2rem;
+    margin: 0;
+}
+
+.profile-info h3 {
+    font-size: 1.2rem;
+    margin: 0;
+}
+
+/* Стили для иконки загрузки фото */
+.upload-icon-label {
+    position: absolute;
+    top: 10px;
+    right: 10px;
+    z-index: 2;
+    background-color: rgba(255,255,255,0.8);
+    border-radius: 50%;
+    padding: 4px;
+    cursor: pointer;
+    transition: background-color 0.3s ease;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+}
+
+.upload-icon-label:hover {
+    background-color: rgba(147,112,219,0.9);
+}
+
+.upload-icon-label svg {
+    width: 24px;
+    height: 24px;
+    fill: #9370db;
+}
+
+#photo-upload-input {
+    display: none;
+}
+
+/* Адаптивность */
+@media (max-width: 600px) {
+    .profile-card {
+        flex-direction: column;
+        align-items: center;
+    }
+
+    .profile-info {
+        text-align: center;
+    }
+}
+</style>
+
+<div class="form_reg py-2 gray-text">
+  <h1 class="title-box">Мой профиль</h1>
+    <!-- Информация о пользователе -->
+    <div class="profile-info-inline">
+        <h2 class="profile-name">{{ user.first_name }} {{ user.last_name }}</h2>
+        <p>{{ user.email }}</p>
+
+        <p>Активных рассылок: {{ active_mailings }}</p>
+        <p>Количество клиентов: {{ recipients_count }}</p>
+
+
+    </div>
+</div>
+{% endblock %}
